@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
+
 import argparse
 from bs4 import BeautifulSoup
 import requests
 import json
+import time
 
 
 def postResults(commitUuid, payload, projectToken, baseUrl):
     url = f'{baseUrl}/2.0/commit/{commitUuid}/issuesRemoteResults'
-    print(url)
     headers = {
         'content-type': 'application/json',
         'project-token': projectToken
@@ -63,11 +64,10 @@ def checkCategoryForPattern(patterns, patternId):
     for p in patterns:
         if p['id'] == patternId:
             return p['category']
-    return None
+    return ''
 
 
 def process(reportPath, commitUuid, projectToken, baseDir, baseUrl,):
-    
     patterns = loadPatterns(baseUrl)
     with open(reportPath, 'r') as f:
         data = f.read()
@@ -132,9 +132,9 @@ def process(reportPath, commitUuid, projectToken, baseDir, baseUrl,):
                 }
             }
         }]
-        print(json.dumps(payload))
-
+       
         postResults(commitUuid, payload, projectToken, baseUrl)
+        time.sleep(5)
         resultsfinal(commitUuid, projectToken, baseUrl)
 
 
@@ -149,7 +149,7 @@ def main():
                         help='the commit uuid')
     parser.add_argument('--basedir', dest='baseDir',
                         default=None, help='where code is clonned')
-    parser.add_argument('--baseurl', dest='baseUrl', default='https://app.codacy.com',
+    parser.add_argument('--baseurl', dest='baseUrl', default='https://api.codacy.com',
                         help='codacy server address (ignore if cloud)')
     args = parser.parse_args()
     process(args.reportPath,args.commitUuid, args.projectToken, args.baseDir, args.baseUrl)
