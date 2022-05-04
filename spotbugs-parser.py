@@ -73,6 +73,8 @@ def process(reportPath, commitUuid, projectToken, baseDir, baseUrl,):
         data = f.read()
         Bs_data = BeautifulSoup(data, "xml")
         srcDir = Bs_data.find('SrcDir').text
+        if not baseDir.endswith('/'):
+            baseDir = baseDir+'/'
         srcDir = srcDir.replace(baseDir, '')
         bug_instances = Bs_data.find_all('BugInstance')
         bugs = []
